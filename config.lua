@@ -6,3 +6,4 @@ prefix   = "system/" .. hostname .. "/"
 
 topic_add(topics, "traffic", 60, { ["eth0"] = "lan"; })
 --topic_add(topics, "traffic", 60, { ["i-ipb"] = "ipb"; ["i-kdg"] = "kdg"; })
+--topic_add(topics, "cpu", 300, { })

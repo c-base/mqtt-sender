@@ -13,7 +13,7 @@ It only needs lua-5.1, lua-socket and lua-posix.
 
 
 Usage
-=====
+-----
 
 Just type make after checkout and it will produce a debian and
 openwrt package. 

@@ -60,7 +60,9 @@ function process(mqtt,prefix,topics)
 		assert(type(v["name"]) == "string",   "topic element \"name\" must contain a name as string")
 		assert(type(v["args"]) == "table",    "topic element \"args\" must contain a table")
 		r = v["func"](v["time"],v["args"])
-		if ( r and mqtt.connected ) then
+		if ( mqtt == nil ) then
+			print(v["name"], r)
+		elseif ( r and mqtt.connected ) then
 			e = mqtt:publish(prefix .. v["name"], r)
 			if ( e ) then
 				log("ERR",error_message)

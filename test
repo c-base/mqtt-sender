@@ -1,0 +1,18 @@
+#!/usr/bin/lua
+-- vim: ts=2 sw=2 ai
+-- ------------------------------------------------------------------------- --
+-- mqtt client v0.1 2014-12-25, mm@c-base.org
+-- ------------------------------------------------------------------------- --
+
+topics = {}
+
+require "socket"
+require "daemon"
+require "test-config"
+
+process(mqtt,prefix,topics)
+
+while (1) do
+	process(mqtt,prefix,topics)
+  socket.sleep(1)
+end
