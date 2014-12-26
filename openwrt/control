@@ -1,6 +1,6 @@
 Package: mqtt-sender
 Version: @VERSION@
-Depends: lua, lua-posix
+Depends: lua, lua-posix, lua-socket
 Provides: 
 Source: /home/mm/mqtt-sender/
 Section: network

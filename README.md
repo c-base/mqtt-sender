@@ -9,7 +9,7 @@ Uses the lua mqtt library from:
 I added the ability to publish retained topics, the changes 
 are in the file "retained_topic.patch".
 
-It only needs lua-5.1 and lua-posix.
+It only needs lua-5.1, lua-socket and lua-posix.
 
 
 Usage

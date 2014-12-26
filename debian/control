@@ -3,7 +3,7 @@ Version: @VERSION@
 Architecture: all
 Maintainer: MM <mm@c-base.org>
 Installed-Size: @SIZE@
-Depends: lua5.1, lua-posix
+Depends: lua5.1, lua-posix, lua-socket
 Section: unknown
 Priority: extra
 Homepage: [none]
