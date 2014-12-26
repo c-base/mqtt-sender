@@ -17,7 +17,6 @@ topics = {}
 require "config"
 
 local mqtt = MQTT.client.create(server, port, function() end)
-process(mqtt,prefix,topics)
 
 daemon("/var/run/mqtt-sender.pid")
 

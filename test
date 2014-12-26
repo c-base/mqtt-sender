@@ -10,8 +10,6 @@ require "socket"
 require "daemon"
 require "test-config"
 
-process(mqtt,prefix,topics)
-
 while (1) do
 	process(mqtt,prefix,topics)
   socket.sleep(1)
