@@ -13,12 +13,12 @@ function cpu(interval,args)
 	local c = 0;
   local f = io.open("/proc/loadavg", "r")
   if ( f ) then
+    local load1 = f:read("*number")
     local load5 = f:read("*number")
     local load15 = f:read("*number")
-    local load30 = f:read("*number")
 
-		stats = string.format("{\"load5\":\"%.2f\",\"load15\":\"%.2f\",\"load30\":\"%.2f\"}",
-			load5, load15, load30)
+		stats = string.format("{\"load1\":\"%.2f\",\"load5\":\"%.2f\",\"load15\":\"%.2f\"}",
+			load1, load5, load15)
 		f:close()
   end
 	state["last"] = now
