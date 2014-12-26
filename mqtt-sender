@@ -9,6 +9,9 @@ local MQTT = require("mqtt")
 local pipe = io.popen("/bin/hostname -s")
 hostname = pipe:read("*line")
 pipe:close()
+
+local id = "mqtt_send_" .. hostname
+
 topics = {}
 
 require "config"
@@ -17,12 +20,17 @@ local mqtt = MQTT.client.create(server, port, function() end)
 process(mqtt,prefix,topics)
 
 daemon("/var/run/mqtt-sender.pid")
+
 log("INFO","starting")
 while (1) do
 	local error_message = nil
 	local stats = nil
   if ( not mqtt.connected ) then
-    error_message = mqtt:connect(id, presence, 0, 1, "")
+		if ( string.len(presence) > 8 ) then
+    	error_message = mqtt:connect(id, presence, 0, 1, "")
+		else
+    	error_message = mqtt:connect(id)
+		end
     if ( error_message ) then
       log("ERR",error_message)
       error_message = nil

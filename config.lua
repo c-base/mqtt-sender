@@ -1,6 +1,6 @@
 server   = "c-beam.cbrp3.c-base.org"
 port     = 1883
-id       = "mqtt_" .. hostname
+
 presence = "client/" .. hostname
 prefix   = "system/" .. hostname .. "/"
 
