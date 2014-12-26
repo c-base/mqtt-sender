@@ -1,0 +1,41 @@
+--- mqtt.lua.org	2014-12-25 20:39:58.630595991 +0100
++++ mqtt.lua	2014-12-25 20:45:26.382695312 +0100
+@@ -85,7 +85,7 @@
+ ---
+ -- @field [parent = #mqtt_library] utility#utility Utility
+ --
+-MQTT.Utility = require "paho.utility"
++MQTT.Utility = require "utility"
+ 
+ ---
+ -- @field [parent = #mqtt_library] #number VERSION
+@@ -481,8 +481,9 @@
+                  -- return: nil or error message
+ 
+ -- TODO: Complete implementation of fixed header byte 1
++  if ( flags == nil ) then flags = 0 end
+ 
+-  local message = string.char(MQTT.Utility.shift_left(message_type, 4))
++  local message = string.char(MQTT.Utility.shift_left(message_type, 4) + flags)
+ 
+   if (payload == nil) then
+     message = message .. string.char(0)  -- Zero length, no payload
+@@ -778,7 +779,8 @@
+ --
+ function MQTT.client:publish(                                     -- Public API
+   topic,    -- string
+-  payload)  -- string
++  payload,  -- string
++  flags)    -- integer, use 1 for retained topics
+ 
+   if (self.connected == false) then
+     error("MQTT.client:publish(): Not connected")
+@@ -788,7 +790,7 @@
+ 
+   local message = MQTT.client.encode_utf8(topic) .. payload
+ 
+-  self:message_write(MQTT.message.TYPE_PUBLISH, message)
++  self:message_write(MQTT.message.TYPE_PUBLISH, message, flags)
+ end
+ 
+ --- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - --

@@ -1,0 +1,35 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2014 Martin Mueller <mm@c-base.org>
+
+START=90
+STOP=10
+
+NAME=mqtt-sender
+DAEMON=/usr/sbin/$NAME
+
+start() {
+	if [ -r /var/run/${NAME}.pid ] ; then
+		PID=$(cat /var/run/${NAME}.pid)
+		if [ [ -d /proc/$PID ] && grep -q "$NAME" /proc/$PID/cmdline ] ; then
+			echo "$NAME already running"
+			return 1
+		fi
+		rm -f /var/run/${NAME}.pid
+	fi
+        $DAEMON || return 2
+}
+
+stop() {
+	if [ -r /var/run/${NAME}.pid ] ; then
+		PID=$(cat /var/run/${NAME}.pid)
+		[ -d /proc/$PID ] && kill $PID || return 1
+		sleep 1
+		[ -d /proc/$PID ] && kill -9 $PID
+		[ -d /proc/$PID ] || return 2
+		rm -f /var/run/${NAME}.pid
+	else
+		return 1
+	fi
+	rm -f /var/run/${NAME}.pid
+	return 0
+}

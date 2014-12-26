@@ -1,0 +1,10 @@
+Package: mqtt-sender
+Version: @VERSION@
+Architecture: all
+Maintainer: MM <mm@c-base.org>
+Installed-Size: @SIZE@
+Depends: lua5.1, lua-posix
+Section: unknown
+Priority: extra
+Homepage: [none]
+Description: small statistics daemon, which sends data via mqtt

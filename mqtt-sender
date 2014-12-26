@@ -1,0 +1,47 @@
+#!/usr/bin/lua
+-- vim: ts=2 sw=2 ai
+-- ------------------------------------------------------------------------- --
+-- mqtt client v0.1 2014-12-25, mm@c-base.org
+-- ------------------------------------------------------------------------- --
+package.path = '/usr/share/mqtt-sender/?.lua;/etc/mqtt-sender/?.lua;/etc/mqtt-sender/modules/?.lua;' .. package.path
+require "daemon"
+local MQTT = require("mqtt")
+local pipe = io.popen("/bin/hostname -s")
+hostname = pipe:read("*line")
+pipe:close()
+topics = {}
+
+require "config"
+
+local mqtt = MQTT.client.create(server, port, function() end)
+process(mqtt,prefix,topics)
+
+daemon("/var/run/mqtt-sender.pid")
+log("INFO","starting")
+while (1) do
+	local error_message = nil
+	local stats = nil
+  if ( not mqtt.connected ) then
+    error_message = mqtt:connect(id, presence, 0, 1, "")
+    if ( error_message ) then
+      log("ERR",error_message)
+      error_message = nil
+    else
+		  log("INFO","connected")
+      mqtt:publish(presence, "1", 1)
+      if ( error_message ) then
+        log("ERR",error_message)
+        error_message = nil
+      end
+    end
+  end
+  if ( mqtt.connected ) then
+    error_message = mqtt:handler()
+    if ( error_message ) then
+      log("ERR",error_message)
+      error_message = nil
+    end
+		process(mqtt,prefix,topics)
+  end
+  socket.sleep(1)
+end

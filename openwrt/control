@@ -1,0 +1,14 @@
+Package: mqtt-sender
+Version: @VERSION@
+Depends: lua, lua-posix
+Provides: 
+Source: /home/mm/mqtt-sender/
+Section: network
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: MM <mm@c-base.org>
+Architecture: all
+Installed-Size: @SIZE@
+Description: small lua mqtt statistics sender
+

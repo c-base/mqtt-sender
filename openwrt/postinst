@@ -1,0 +1,7 @@
+#!/bin/sh
+if [ -z "${IPKG_INSTROOT}" ]; then
+	if [ -x /etc/init.d/mqtt-sender ] ; then
+		/etc/init.d/mqtt-sender enable
+		/etc/init.d/mqtt-sender start
+	fi
+fi
