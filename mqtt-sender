@@ -55,7 +55,7 @@ end
 
 local mqtt = MQTT.client.create(server, port, callback)
 
--- daemon("/var/run/mqtt-sender.pid")
+daemon("/var/run/mqtt-sender.pid")
 
 log("INFO","starting")
 while (1) do
