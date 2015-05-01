@@ -26,30 +26,31 @@ end
 
 local id = "mqtt_send_" .. hostname
 
+-- holds modules that publish topic
 topics = {}
+-- holds modules that subscribe to topics and react to messages
+subscriptions = {}
 
 require "config"
 
 -- Is called when a message from one of the subscribed topics comes in.
 function callback(topic, message)
-	if (topic == "info/time") then
-		print("It is the time: " .. message)
-	end
-	if (topic == "ampel/nerd") then
-		decoded = luci.json.decode(message)
-		print("decoded ampel message")
-		value = decoded['red']
-		print("red: " .. value)
-		local gpio = 15	
-		os.execute("echo " .. value .. " > /sys/class/gpio/gpio" .. gpio .. "/value")
-		value = decoded['green']
-		print("green: " .. value)
-		local gpio = 14
-		os.execute("echo " .. value .. " > /sys/class/gpio/gpio" .. gpio .. "/value")
-	end
-    if (message == "quit") then running = false end
+	for sub in subscruptions do
+    local sub_topic = sub["topic"]
+    if (topic == sub_topic) then
+      local handler_func = sub["callback"]
+      local args = sub["args"]
+      handler_func(message, args)
+    end
+  end
 end
 
+-- subscribe to every topic that is set in supscriptions
+function subscript_to_topics(subscriptions, mqtt_client)
+  for sub in subscriptions do
+    mqtt_client:subscribe({sub["topic"]})
+  end
+end
 
 local mqtt = MQTT.client.create(server, port, callback)
 
@@ -57,40 +58,41 @@ daemon("/var/run/mqtt-sender.pid")
 
 log("INFO","starting")
 while (1) do
-    local error_message = nil
+  local error_message = nil
 	local stats = nil
     
 -- make sure that we are connected and are subscribed to our topics
 -- before we call the handler()-method in every loop.
-    if ( not mqtt.connected ) then
+  if ( not mqtt.connected ) then
 		if ( string.len(presence) > 8 ) then
     	    error_message = mqtt:connect(id, presence, 0, 1, "")
 		else
     	    error_message = mqtt:connect(id)
 		end
+      if ( error_message ) then
+        log("ERR",error_message)
+          error_message = nil
+      else
+        log("INFO","connected")
+        mqtt:publish(presence, "1", 1)
+        -- subscribe to every topic that is set in supscriptions
+        subscript_to_topics(subscriptions, mqtt)
         if ( error_message ) then
-            log("ERR",error_message)
-            error_message = nil
-        else
-            log("INFO","connected")
-            mqtt:publish(presence, "1", 1)
-	    mqtt:subscribe({"info/time"})
-	    mqtt:subscribe({"ampel/nerd"})
-            if ( error_message ) then
-                log("ERR",error_message)
-                error_message = nil
-            end
+              log("ERR",error_message)
+              error_message = nil
         end
-    end
+      end
+  end
 
 -- Now we are sure that we are connected
-    if ( mqtt.connected ) then
-        error_message = mqtt:handler()
-        if ( error_message ) then
-            log("ERR",error_message)
-            error_message = nil
-        end
-		process(mqtt,prefix,topics)
+  if ( mqtt.connected ) then
+    error_message = mqtt:handler()
+    if ( error_message ) then
+      log("ERR",error_message)
+      error_message = nil
     end
-    socket.sleep(1)
-end
+	process(mqtt,prefix,topics)
+  end
+  socket.sleep(1)
+
+end -- end while

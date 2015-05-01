@@ -41,6 +41,13 @@ function topic_add (topics, name, time, args)
 	topics[#topics]["args"] = args
 end
 
+function subscription_add(subscriptions, module, topic, args)
+    subscriptions[#subscriptions+1] = {}
+    subscriptions[#subscriptions+1]["topic"] = topic
+    subscriptions[#subscriptions+1]["callback"] = require(module)
+    subscriptions[#subscriptions+1]["args"] = args
+end
+
 function tprint(level, index, value)
 	local i, v
 	print(level, index, value)
