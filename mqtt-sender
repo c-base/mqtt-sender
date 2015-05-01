@@ -35,11 +35,11 @@ require "config"
 
 -- Is called when a message from one of the subscribed topics comes in.
 function callback(topic, message)
-  print("Received on " .. topic .. ": " .. message)
+  log("INFO", "Received on " .. topic .. ": " .. message)
 	for i=1,#subscriptions do
     local sub_topic = subscriptions[i]["topic"]
     if (topic == sub_topic) then
-      print("Received message for " .. topic .. ", calling module ")
+      log("INFO", "Received message for " .. topic .. ", calling module ")
       local args = subscriptions[i]["args"]
       subscriptions[i]["callback"](message, args)
     end
