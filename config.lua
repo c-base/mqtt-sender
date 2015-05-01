@@ -1,4 +1,5 @@
-server   = "c-beam.cbrp3.c-base.org"
+-- server   = "c-beam.cbrp3.c-base.org"
+server   = "10.0.1.17"
 port     = 1883
 
 presence = "client/" .. hostname

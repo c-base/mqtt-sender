@@ -115,7 +115,7 @@ function daemon(pidfile)
 	p.signal(p.SIGTERM, function() os.remove(pidfile); log("NOTICE", "exiting"); p._exit(0) end)
 	p.openlog('mqtt-netstat',p.LOG_PID,p.LOG_DAEMON)
 	is_daemon = true
-	if p.version == "posix library for Lua 5.1 / 31" then
+	if p.version == "posix library for Lua 5.1 / 31" or p.version == "posix library for Lua 5.1 / 32" then
 		p.close(0); p.open("/dev/null", p.O_RDONLY);
 		p.close(1); p.open("/dev/null", p.O_WRONLY);
 		p.close(2); p.open("/dev/null", p.O_WRONLY);
