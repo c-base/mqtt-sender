@@ -10,9 +10,9 @@ function ampel(message, args)
     if (decoded[color] ~= nil) then 
       value = tonumber(decoded[color])
     	os.execute("echo " .. value .. " > /sys/class/gpio/gpio" .. pin .. "/value")
-      
     end
   end
+  print("Done setting GPIO pins in module AMPEL")
 end
 
 return(ampel)

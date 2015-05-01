@@ -35,26 +35,27 @@ require "config"
 
 -- Is called when a message from one of the subscribed topics comes in.
 function callback(topic, message)
-	for sub in subscruptions do
-    local sub_topic = sub["topic"]
+  print("Received on " .. topic .. ": " .. message)
+	for i=1,#subscriptions do
+    local sub_topic = subscriptions[i]["topic"]
     if (topic == sub_topic) then
-      local handler_func = sub["callback"]
-      local args = sub["args"]
-      handler_func(message, args)
+      print("Received message for " .. topic .. ", calling module ")
+      local args = subscriptions[i]["args"]
+      subscriptions[i]["callback"](message, args)
     end
   end
 end
 
 -- subscribe to every topic that is set in supscriptions
-function subscript_to_topics(subscriptions, mqtt_client)
-  for sub in subscriptions do
-    mqtt_client:subscribe({sub["topic"]})
+function subscribe_to_topics(subscriptions, mqtt_client)
+  for i=1,#subscriptions do
+    mqtt_client:subscribe({subscriptions[i]["topic"]})
   end
 end
 
 local mqtt = MQTT.client.create(server, port, callback)
 
-daemon("/var/run/mqtt-sender.pid")
+-- daemon("/var/run/mqtt-sender.pid")
 
 log("INFO","starting")
 while (1) do
@@ -76,7 +77,7 @@ while (1) do
         log("INFO","connected")
         mqtt:publish(presence, "1", 1)
         -- subscribe to every topic that is set in supscriptions
-        subscript_to_topics(subscriptions, mqtt)
+        subscribe_to_topics(subscriptions, mqtt)
         if ( error_message ) then
               log("ERR",error_message)
               error_message = nil
