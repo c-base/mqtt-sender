@@ -1,11 +1,10 @@
-#!/usr/bin/lua
+#!/usr/bin/lua5.1
 -- vim: ts=2 sw=2 ai
 -- ------------------------------------------------------------------------- --
 -- mqtt client v0.1 2014-12-25, mm@c-base.org
 -- ------------------------------------------------------------------------- --
 package.path = '/usr/share/mqtt-sender/?.lua;/etc/mqtt-sender/?.lua;/etc/mqtt-sender/modules/?.lua;' .. package.path
 require "daemon"
-require "luci.json"
 local MQTT = require("mqtt")
 
 function file_exists(name)
@@ -19,6 +18,7 @@ if (file_exists("/bin/hostname")) then
 	hostname = pipe:read("*line")
 	pipe:close()
 else
+	require "luci.json"
 	local pipe = io.popen("uci get system.@system[0].hostname")
 	hostname = pipe:read("*line")
 	pipe:close()
@@ -35,11 +35,11 @@ require "config"
 
 -- Is called when a message from one of the subscribed topics comes in.
 function callback(topic, message)
-  log("INFO", "Received on " .. topic .. ": " .. message)
+  --log("INFO", "Received on " .. topic .. ": " .. message)
 	for i=1,#subscriptions do
     local sub_topic = subscriptions[i]["topic"]
     if (topic == sub_topic) then
-      log("INFO", "Received message for " .. topic .. ", calling module ")
+      --log("INFO", "Received message for " .. topic .. ", calling module ")
       local args = subscriptions[i]["args"]
       subscriptions[i]["callback"](message, args)
     end
@@ -55,7 +55,7 @@ end
 
 local mqtt = MQTT.client.create(server, port, callback)
 
-daemon("/var/run/mqtt-sender.pid")
+--daemon("/var/run/mqtt-sender.pid")
 
 log("INFO","starting")
 while (1) do

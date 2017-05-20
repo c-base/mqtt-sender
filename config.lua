@@ -8,4 +8,5 @@ prefix   = "system/" .. hostname .. "/"
 --topic_add(topics, "traffic", 60, { ["eth0"] = "lan"; })
 --topic_add(topics, "traffic", 60, { ["i-ipb"] = "ipb"; ["i-kdg"] = "kdg"; })
 --topic_add(topics, "cpu", 300, { })
-subscription_add(subscriptions, "mod_ampel", "ampel/nerd", {["pins"] = {["green"] = "14", ["red"] = "15"}})
+--subscription_add(subscriptions, "mod_ampel", "ampel/nerd", {["pins"] = {["green"] = "14", ["red"] = "15"}})
+subscription_add(subscriptions, "mod_traffic_stats", "system/echelon/traffic", {})
