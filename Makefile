@@ -1,7 +1,7 @@
 #!/usr/bin/make
 
 VERSION=0.2
-REV=1
+REV=2
 
 all: deb ipk
 
