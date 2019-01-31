@@ -69,15 +69,10 @@ function process(mqtt,prefix,topics)
 		r = v["func"](v["time"],v["args"])
 		if ( mqtt == nil ) then
 			print(v["name"], r)
-		elseif ( r and mqtt.connected ) then
-			e = mqtt:publish(prefix .. v["name"], r)
-			if ( e ) then
-				log("ERR",error_message)
-				return
-			end
-			e = mqtt:handler()
-			if ( e ) then
-				log("ERR",error_message)
+		elseif ( r and mqtt.connection ) then
+			if not mqtt:publish{ topic = prefix .. v["name"], payload = r} then
+				log("ERR", "publish " .. v["name"] .. " failed")
+				mqtt:close_connection()
 				return
 			end
 		end

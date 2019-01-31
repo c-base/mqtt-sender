@@ -3,8 +3,9 @@
 -- ------------------------------------------------------------------------- --
 -- mqtt client v0.1 2014-12-25, mm@c-base.org
 -- ------------------------------------------------------------------------- --
-package.path = '/usr/share/mqtt-sender/?.lua;/etc/mqtt-sender/?.lua;/etc/mqtt-sender/modules/?.lua;' .. package.path
+package.path = '/usr/share/mqtt-sender/?/init.lua;/usr/share/mqtt-sender/?.lua;/etc/mqtt-sender/?.lua;/etc/mqtt-sender/modules/?.lua;' .. package.path
 require "daemon"
+local socket = require "socket"
 local MQTT = require("mqtt")
 
 function file_exists(name)
@@ -33,29 +34,22 @@ subscriptions = {}
 
 require "config"
 
--- Is called when a message from one of the subscribed topics comes in.
-function callback(topic, message)
-  --log("INFO", "Received on " .. topic .. ": " .. message)
-	for i=1,#subscriptions do
-    local sub_topic = subscriptions[i]["topic"]
-    if (topic == sub_topic) then
-      --log("INFO", "Received message for " .. topic .. ", calling module ")
-      local args = subscriptions[i]["args"]
-      subscriptions[i]["callback"](message, args)
-    end
-  end
+local mqtt
+if presence then
+	mqtt = MQTT.client{
+  	uri = server .. ":" .. port,
+		clean = true,
+		will = { topic = presence, payload = "offline", retain = true }
+	}
+else
+	mqtt = MQTT.client{
+  	uri = server .. ":" .. port,
+		clean = true,
+	}
 end
 
--- subscribe to every topic that is set in supscriptions
-function subscribe_to_topics(subscriptions, mqtt_client)
-  for i=1,#subscriptions do
-    mqtt_client:subscribe({subscriptions[i]["topic"]})
-  end
-end
 
-local mqtt = MQTT.client.create(server, port, callback)
-
---daemon("/var/run/mqtt-sender.pid")
+daemon("/run/mqtt-sender.pid")
 
 log("INFO","starting")
 while (1) do
@@ -64,36 +58,21 @@ while (1) do
     
 -- make sure that we are connected and are subscribed to our topics
 -- before we call the handler()-method in every loop.
-  if ( not mqtt.connected ) then
-		if ( string.len(presence) > 8 ) then
-    	    error_message = mqtt:connect(id, presence, 0, 1, "")
-		else
-    	    error_message = mqtt:connect(id)
-		end
-      if ( error_message ) then
-        log("ERR",error_message)
-          error_message = nil
-      else
+	if not mqtt.connection then
+		if mqtt:_open_connection() then
+			if not mqtt:_send_connect() then
+				mqtt:close_connection()
+			else
+				if presence then
+					mqtt:publish{ topic = presence, payload = "online", retain = true }
+				end
         log("INFO","connected")
-        mqtt:publish(presence, "1", 1)
-        -- subscribe to every topic that is set in supscriptions
-        subscribe_to_topics(subscriptions, mqtt)
-        if ( error_message ) then
-              log("ERR",error_message)
-              error_message = nil
-        end
-      end
-  end
+			end
+		end
+	end
 
 -- Now we are sure that we are connected
-  if ( mqtt.connected ) then
-    error_message = mqtt:handler()
-    if ( error_message ) then
-      log("ERR",error_message)
-      error_message = nil
-    end
 	process(mqtt,prefix,topics)
-  end
   socket.sleep(1)
 
 end -- end while

@@ -1,16 +1,23 @@
 #!/usr/bin/make
 
-VERSION=0.2
-REV=2
+VERSION=0.3
+REV=1
+
+MQTTREV=v1.4
 
 all: deb ipk
 
-deb:
+luamqtt:
+	@git clone https://github.com/xHasKx/luamqtt.git
+	@( cd luamqtt; git fetch; git checkout $(MQTTREV) )
+
+deb: luamqtt
 	@fakeroot -- /bin/bash -ec " \
 	mkdir -p deb/data/usr/sbin ; \
 	install -o root -g root -m 770 mqtt-sender deb/data/usr/sbin ; \
 	mkdir -p deb/data/usr/share/mqtt-sender ; \
-	install -o root -g root -m 644 {mqtt,utility,daemon}.lua deb/data/usr/share/mqtt-sender ; \
+	install -o root -g root -m 644 {inspect,utility,daemon}.lua deb/data/usr/share/mqtt-sender ; \
+	cp -a luamqtt/mqtt deb/data/usr/share/mqtt-sender/ ; \
 	mkdir -p deb/data/etc/mqtt-sender/modules ; \
 	install -o root -g root -m 644 mod_*.lua deb/data/etc/mqtt-sender/modules ; \
 	install -o root -g root -m 644 config.lua deb/data/etc/mqtt-sender ; \
@@ -31,12 +38,13 @@ deb:
 	ar qc mqtt-sender_${VERSION}-${REV}_all.deb deb/debian-binary deb/control.tar.gz deb/data.tar.gz ; \
 	rm -rf deb"
 
-ipk:
+ipk: luamqtt
 	@fakeroot -- /bin/bash -ec " \
 	mkdir -p ipk/data/usr/sbin ; \
 	install -o root -g root -m 770 mqtt-sender ipk/data/usr/sbin ; \
 	mkdir -p ipk/data/usr/share/mqtt-sender ; \
-	install -o root -g root -m 644 {mqtt,utility,daemon}.lua ipk/data/usr/share/mqtt-sender ; \
+	install -o root -g root -m 644 {inspect,utility,daemon}.lua ipk/data/usr/share/mqtt-sender ; \
+	cp -a luamqtt/mqtt ipk/data/usr/share/mqtt-sender/ ; \
 	mkdir -p ipk/data/etc/mqtt-sender/modules ; \
 	install -o root -g root -m 644 mod_*.lua ipk/data/etc/mqtt-sender/modules ; \
 	install -o root -g root -m 644 config.lua ipk/data/etc/mqtt-sender ; \
